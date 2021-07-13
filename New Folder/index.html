@@ -1,0 +1,139 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="utf-8" />
+  <title>
+   タイピングアプリ
+  </title>
+  <style>
+   body {
+    font-size: 6em; 
+    text-align: center;
+   }
+   #count {
+    margin: 0;
+    font-weight: bold;
+    color: #888;
+   }
+   #wrap {
+    margin-top: 20px;
+    padding: 20px 10px;
+    background-color: #666;
+    font-weight: bold;
+    color: #fff;
+   }
+   span {
+    transition: all 300ms 0s ease;
+   }
+   .add-color {
+    font-size: 0.5em;
+    color: #666;
+   }
+  </style>
+ </head>
+ <body>
+  <p id="count">
+   60
+  </p>
+  <div id="wrap">
+   <p id="text">
+   </p>
+  </div>
+  <button id="start">
+   スタート
+  </button>
+  <script>    
+   const wrap = document.getElementById('wrap');
+   const start = document.getElementById('start');
+
+   const textLists = [                // 複数のテキストを格納する配列
+    'Hello World','This is my App','How are you?',
+    'Today is sunny','I love JavaScript!','Good morning',
+    'I am Japanese','Let it be','Samurai',
+    'Typing Game','Information Technology',
+    'I want to be a programmer','What day is today?',
+    'I want to build a web app','Nice to meet you',
+    'Chrome Firefox Edge Safari','machine learning',
+    'Brendan Eich','John Resig','React Vue Angular',
+    'Netscape Communications','undefined null NaN',
+    'Thank you very much','Google Apple Facebook Amazon',
+    'ECMAScript','console.log','for while if switch',
+    'var let const','Windows Mac Linux iOS Android',
+    'programming'
+   ];
+
+   let checkTexts = [];  
+  
+   const createText = () => {     // ランダムなテキストを画面に表示する
+    const p = document.getElementById('text');
+    const rnd = Math.floor(Math.random() * textLists.length);  //配列からランダムに使っていく
+    p.textContent = '';
+    checkTexts = textLists[rnd].split('').map(value => {   //画面に表示された文字をcheckTexetsに移動させる
+     const span = document.createElement('span');   //span要素を作る
+     span.textContent = value;     //spanに1文字ずつ当てはめていく
+     p.appendChild(span);        //spanをｐ要素に入れる
+     return span;       //1文字ずつ分解してcheackTextsに移動させる
+    })
+   };
+   
+   let score = 0;    //スコアの初期値
+   
+   const keyDown = e => {       // キーイベント＆入力判定処理 
+    wrap.style.backgroundColor = '#666';
+    if(e.key === checkTexts[0].textContent) {   //背景の色を設定
+     checkTexts[0].className = 'add-color';  //checkTextsにクラスを付与
+     checkTexts.shift();        //1文字削除（add-colorが適用）
+     score++;    //入力が合っていればポイント加算
+     if(!checkTexts.length) createText(); //文字を入力し終わったらまた１から
+    }
+    else if(e.key === 'shift'){
+     wrap.style.backgroundColor = '#666';   //shiftキーは変化なし
+    }
+    else {
+     wrap.style.backgroundColor ='red';
+    }
+   }; 
+
+   const rankCheck = rank => {        // ランク判定とメッセージ生成処理
+     let text = '';
+     if(score<100){
+      text = 'あなたのランクはCです。\nBランクまであと${100-score}です。';
+     }
+     else if(score<200){
+      text = 'あなたのランクはBです。\nAランクまであと${200-score}です。';
+     }
+     else if(score<300){
+      text = 'あなたのランクはAです。\nSランクまであと${300-score}です。';
+     }
+     else if(score<400){
+      text = 'あなたのランクはSです。\nおめでとうございます！';
+     }
+     return `${score}文字打てました！\n${text}\n【OK】リトライ/【キャンセル】終了`;  //何文字打てたかを表示する
+   }; 
+
+   const gameOver = id => {     //// ゲームの終了処理
+     clearInterval(id);
+     const result =confirm(rankCheck(score));   //スコアの値をrankCheckに移す
+     if(result) window.location.reload();    //ゲーム終了時にOKボタンを押すとリスタートする
+   };
+
+   const timer = () => {      // タイマー処理
+     let time = 60;    //初期の時間が60秒
+     const count = document.getElementById('count');　　
+     const id = setInterval(() => {   //1秒ずつ実行する
+      if(time <= 0) gameOver(id);    //0秒になったらgameOverに移動
+      count.textContent = time--;    //1秒ずつ減っていく
+     },1000);
+   }; 
+
+
+   start.addEventListener('click', () => {    //スタート押したときに実行される
+    createText();
+    timer();
+    createText();
+    start.style.display = 'none';            //スタート消える
+    document.addEventListener('keydown',keyDown);
+   })
+  </script>
+ </body>
+</html>
